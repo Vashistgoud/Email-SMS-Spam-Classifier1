@@ -6,18 +6,29 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 import os
 
-# Download and setup NLTK resources
-nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
 
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path)
+# Ensure that only the correct NLTK resources are used
+def download_nltk_resources():
+    nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
+
+    # Download necessary NLTK resources to the specified path
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path)
+
+    # Explicitly download the correct resources
     nltk.download('punkt', download_dir=nltk_data_path)
     nltk.download('stopwords', download_dir=nltk_data_path)
 
-nltk.data.path.append(nltk_data_path)
+    # Set NLTK data path to ensure it's using the correct directory
+    nltk.data.path = [nltk_data_path]
+
+
+# Call the function to download resources
+download_nltk_resources()
 
 # Initialize the PorterStemmer
 ps = PorterStemmer()
+
 
 def transform_text(text):
     text = text.lower()
@@ -42,6 +53,7 @@ def transform_text(text):
         y.append(ps.stem(i))
 
     return " ".join(y)
+
 
 # Load the TF-IDF vectorizer and the model
 tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
