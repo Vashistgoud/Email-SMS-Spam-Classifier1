@@ -1,0 +1,42 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+
+# Python-specific ignored files
+/venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# NLTK data (if stored locally)
+nltk_data/
+
+# IDE-specific ignored files
+.idea/
+*.iml
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+/logs/
+*.swp
+*.swo
+
+# Environment files
+.env
+
+# Data and output files
+/data/
+/output/
+*.csv
+*.h5
+*.db
+
