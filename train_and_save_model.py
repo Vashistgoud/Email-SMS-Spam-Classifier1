@@ -1,86 +1,22 @@
-import string
-import pickle
-import nltk
+import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
-import os
-
-# Set NLTK data path
-nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
-
-# Ensure the directory exists
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path)
-
-# Download necessary NLTK resources
-nltk.download('punkt', download_dir=nltk_data_path)
-nltk.download('stopwords', download_dir=nltk_data_path)
-
-# Set the NLTK data path explicitly
-nltk.data.path.append(nltk_data_path)
-
-# Initialize the PorterStemmer
-ps = PorterStemmer()
-
-# Preprocess the text
-def preprocess_text(text):
-    text = text.lower()
-    text = nltk.word_tokenize(text)
-    text = [ps.stem(word) for word in text if word.isalnum() and word not in stopwords.words('english')]
-    return " ".join(text)
+from sklearn.pipeline import Pipeline
 
 # Sample training data
-texts = [
-    "Free money now!!!",
-    "Hi, how are you?",
-    "Get rich quick with this investment opportunity",
-    "Meeting tomorrow at 10 AM",
-    "Congratulations, you have won a prize!"
-]
+texts = ["Free money now!!!", "Hi, how are you?", "Get rich quick with this investment opportunity", "Meeting tomorrow at 10 AM", "Congratulations, you have won a prize!"]
 labels = [1, 0, 1, 0, 1]  # 1 for spam, 0 for not spam
 
-# Preprocess the texts
-texts = [preprocess_text(text) for text in texts]
-
-# Create and fit the TF-IDF Vectorizer
-vectorizer = TfidfVectorizer(stop_words=stopwords.words('english'))
-X = vectorizer.fit_transform(texts)  # Fit and transform the data
+# Create a pipeline with TF-IDF Vectorizer and Multinomial Naive Bayes
+text_clf = Pipeline([
+    ('tfidf', TfidfVectorizer()),
+    ('clf', MultinomialNB())
+])
 
 # Train the model
-model = MultinomialNB()
-model.fit(X, labels)
+text_clf.fit(texts, labels)
 
-# Save the fitted vectorizer and model
-with open('vectorizer.pkl', 'wb') as file:
-    pickle.dump(vectorizer, file)
+# Save the model
+joblib.dump(text_clf, 'text_clf_model.joblib')
 
-with open('model.pkl', 'wb') as file:
-    pickle.dump(model, file)
-
-# Optionally, save metadata for future reference
-metadata = {
-    'vectorizer_params': vectorizer.get_params(),
-    'model_params': model.get_params(),
-    'training_data': texts,
-    'labels': labels
-}
-
-with open('metadata.pkl', 'wb') as file:
-    pickle.dump(metadata, file)
-
-print("Vectorizer, model, and metadata have been saved.")
-
-# Test loading the vectorizer and model
-with open('vectorizer.pkl', 'rb') as file:
-    loaded_vectorizer = pickle.load(file)
-
-with open('model.pkl', 'rb') as file:
-    loaded_model = pickle.load(file)
-
-# Test prediction
-sample_text = "You have won a prize!"
-transformed_sample = loaded_vectorizer.transform([preprocess_text(sample_text)])
-prediction = loaded_model.predict(transformed_sample)
-print("Sample prediction:", "Spam" if prediction[0] == 1 else "Not Spam")
+print("Model has been saved as 'text_clf_model.joblib'.")

@@ -1,35 +1,32 @@
 import streamlit as st
-import pickle
 import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 import os
+import joblib
 
-
-# Ensure that only the correct NLTK resources are used
+# Function to download necessary NLTK resources
 def download_nltk_resources():
     nltk_data_path = os.path.join(os.getcwd(), 'nltk_data')
 
-    # Download necessary NLTK resources to the specified path
     if not os.path.exists(nltk_data_path):
         os.makedirs(nltk_data_path)
 
-    # Explicitly download the correct resources
+    # Download necessary resources to the specified path
     nltk.download('punkt', download_dir=nltk_data_path)
     nltk.download('stopwords', download_dir=nltk_data_path)
 
-    # Set NLTK data path to ensure it's using the correct directory
-    nltk.data.path = [nltk_data_path]
+    # Set the NLTK data path to ensure the correct directory is used
+    nltk.data.path.append(nltk_data_path)
 
-
-# Call the function to download resources
+# Call the function to download the resources
 download_nltk_resources()
 
 # Initialize the PorterStemmer
 ps = PorterStemmer()
 
-
+# Function to preprocess and transform text
 def transform_text(text):
     text = text.lower()
     text = nltk.word_tokenize(text)
@@ -54,10 +51,9 @@ def transform_text(text):
 
     return " ".join(y)
 
-
-# Load the TF-IDF vectorizer and the model
-tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
-model = pickle.load(open('model.pkl', 'rb'))
+# Load the TF-IDF vectorizer and the model using joblib
+tfidf = joblib.load('vectorizer.pkl')
+model = joblib.load('model.pkl')
 
 # Streamlit UI
 st.title("Email/SMS Spam Classifier")
